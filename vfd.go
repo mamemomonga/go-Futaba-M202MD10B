@@ -101,6 +101,16 @@ func (t *VFD) WriteByte(c byte) error {
 	return nil
 }
 
+// 1文字書き込み
+func (t *VFD) PutChar(c byte) error {
+	if err := t.WriteByte(c); err != nil {
+		return err
+	}
+	t.bufText[t.bufPos] = c
+	t.bufPos++
+	return nil
+}
+
 // 半角に変換
 func (t *VFD) convertToHankaku(str string) (string, error) {
 	// 半角にする

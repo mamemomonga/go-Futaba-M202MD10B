@@ -45,7 +45,7 @@ Baud | BAUD0 | BAUD1
 
 ## キャラクター一覧
 
-[![aキャラクター一覧](http://img.youtube.com/vi/LQ5_wHmZV-o/0.jpg)](https://www.youtube.com/watch?v=LQ5_wHmZV-o)
+[![aキャラクター一覧](http://img.youtube.com/vi/s-9mbCNlsLk/0.jpg)](https://www.youtube.com/watch?v=s-9mbCNlsLk)
 
 # 配線
 

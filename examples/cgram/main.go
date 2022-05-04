@@ -35,7 +35,7 @@ func example1() {
 		log.Fatal(err)
 	}
 
-	err = vfd.WriteByte(CGRAM_HEART)
+	err = vfd.PutChar(CGRAM_HEART)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,7 +45,7 @@ func example1() {
 		log.Fatal(err)
 	}
 
-	err = vfd.WriteByte(CGRAM_STAR)
+	err = vfd.PutChar(CGRAM_STAR)
 	if err != nil {
 		log.Fatal(err)
 	}
