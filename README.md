@@ -100,7 +100,7 @@ Baud | BAUD0 | BAUD1
 
 # 参考情報
 
-* [5ch](https://rio2016.5ch.net/test/read.cgi/denki/1640165380/107)
+* [5ch:【共立デジット千石】日本橋電気部品屋総合 その13 107](https://rio2016.5ch.net/test/read.cgi/denki/1640165380/107)
 
 # Lisence
 
