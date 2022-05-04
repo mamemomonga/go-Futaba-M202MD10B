@@ -51,7 +51,7 @@ var (
 type VFD struct {
 	port               serial.Port   // シリアルポート
 	Wait               time.Duration // 次の文字を表示するまでの待機時間
-	Animation          int           // 文字表示効果
+	Animation          int           // 文字アニメーション有効 (AnimationDisable:無効 /  AnimationEnable:有効)
 	AnimationCharStart byte          // 文字表示効果開始ポイント
 	AnimationWait      time.Duration // 文字表示効果ウェイト
 	bufText            [40]byte      // 文字データ
@@ -317,7 +317,7 @@ func (t *VFD) CursorBlink(blink bool) error {
 	return nil
 }
 
-// カーソルの表示
+// カーソルの表示( CursorTypeUnderline, CursorTypeTofu, CursorTypeXOR )
 func (t *VFD) CursorEnable(cursorType int) error {
 	switch cursorType {
 	case CursorTypeUnderline:
@@ -337,6 +337,7 @@ func (t *VFD) CursorEnable(cursorType int) error {
 }
 
 // 明るさの設定
+// Brightness1, Brightness2, Brightness3, Brightness4 のいずれかを設定
 func (t *VFD) Brightness(value int) error {
 	if value < 0 || value > 3 {
 		return ErrBrightnessOutOfRange

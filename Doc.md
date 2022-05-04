@@ -141,7 +141,7 @@ VFDライブラリ
 ```go
 type VFD struct {
     Wait               time.Duration // 次の文字を表示するまでの待機時間
-    Animation          int           // 文字表示効果
+    Animation          int           // 文字アニメーション有効 (AnimationDisable:無効 /  AnimationEnable:有効)
     AnimationCharStart byte          // 文字表示効果開始ポイント
     AnimationWait      time.Duration // 文字表示効果ウェイト
     // contains filtered or unexported fields
@@ -162,7 +162,7 @@ func New() *VFD
 func (t *VFD) Brightness(value int) error
 ```
 
-明るさの設定
+明るさの設定 Brightness1\, Brightness2\, Brightness3\, Brightness4 のいずれかを設定
 
 ### func \(\*VFD\) CGRAM
 
@@ -226,7 +226,7 @@ func (t *VFD) CursorDisable() error
 func (t *VFD) CursorEnable(cursorType int) error
 ```
 
-カーソルの表示
+カーソルの表示\( CursorTypeUnderline\, CursorTypeTofu\, CursorTypeXOR \)
 
 ### func \(\*VFD\) CursorForward
 
