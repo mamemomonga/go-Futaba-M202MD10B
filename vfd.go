@@ -218,6 +218,7 @@ func (t *VFD) textAnimation(c byte) error {
 	return nil
 }
 
+// アニメーション付き画面消去
 func (t *VFD) ClearAnimation() error {
 	t.CursorDisable()
 	t.CursorHome()
@@ -281,8 +282,7 @@ func (t *VFD) CursorHome() error {
 	return t.WriteByte(byte(0x0d))
 }
 
-// カーソルを1行目に
-//  CursorHomeと同じ
+// カーソルを1行目に(CursorHomeと同じ)
 func (t *VFD) CursorLine1() error {
 	return t.CursorHome()
 }
@@ -347,9 +347,7 @@ func (t *VFD) Brightness(value int) error {
 	return nil
 }
 
-// 外字の設定
-// * 既存の文字コードに上書き
-// * 最大8個まで
+// 外字の設定 (既存の文字コードに上書き、最大8個まで)
 func (t *VFD) CGRAM(code byte, data [7]byte) error {
 	if err := t.WriteByte(byte(0x1a)); err != nil {
 		return err
@@ -366,6 +364,7 @@ func (t *VFD) CGRAM(code byte, data [7]byte) error {
 	return nil
 }
 
+// Stringsの配列から外字の登録
 func (t *VFD) CGRAMFromStrings(code byte, graphic [7]string) error {
 	var data [7]byte
 	for i := 0; i < 7; i++ {
@@ -380,6 +379,7 @@ func (t *VFD) CGRAMFromStrings(code byte, graphic [7]string) error {
 	return t.CGRAM(code, data)
 }
 
+// ハードウェアリセット(/DTRピンの接続が必要)
 func (t *VFD) Reset() error {
 	if err := t.port.SetDTR(true); err != nil {
 		return err

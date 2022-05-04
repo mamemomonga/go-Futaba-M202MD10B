@@ -170,13 +170,15 @@ func (t *VFD) Brightness(value int) error
 func (t *VFD) CGRAM(code byte, data [7]byte) error
 ```
 
-外字の設定 \* 既存の文字コードに上書き \* 最大8個まで
+外字の設定 \(既存の文字コードに上書き、最大8個まで\)
 
 ### func \(\*VFD\) CGRAMFromStrings
 
 ```go
 func (t *VFD) CGRAMFromStrings(code byte, graphic [7]string) error
 ```
+
+Stringsの配列から外字の登録
 
 ### func \(\*VFD\) Clear
 
@@ -191,6 +193,8 @@ func (t *VFD) Clear() error
 ```go
 func (t *VFD) ClearAnimation() error
 ```
+
+アニメーション付き画面消去
 
 ### func \(\*VFD\) Close
 
@@ -246,7 +250,7 @@ func (t *VFD) CursorHome() error
 func (t *VFD) CursorLine1() error
 ```
 
-カーソルを1行目に CursorHomeと同じ
+カーソルを1行目に\(CursorHomeと同じ\)
 
 ### func \(\*VFD\) CursorLine2
 
@@ -301,6 +305,8 @@ func (t *VFD) PutChar(c byte) error
 ```go
 func (t *VFD) Reset() error
 ```
+
+ハードウェアリセット\(/DTRピンの接続が必要\)
 
 ### func \(\*VFD\) WriteByte
 
