@@ -6,6 +6,41 @@ Futaba M202MD10B Go ライブラリ
 
 [![GoDoc](https://godoc.org/github.com/mamemomonga/go-Futaba-M202MD10B?status.svg)](https://godoc.org/github.com/mamemomonga/go-Futaba-M202MD10B)
 
+うまく閲覧できない場合は[こちら](./Doc.md)をご覧下さい。
+
+# クイックスタート
+
+	$ mkdir work
+	$ cd work
+	$ go mod init example.com/app
+	$ go mod vendor
+	$ cat > main.go << 'EOS'
+	package main
+
+	import (
+		"log"
+
+		M202MD10B "github.com/mamemomonga/go-Futaba-M202MD10B"
+	)
+
+	func main() {
+		var err error
+		vfd := M202MD10B.New()
+		err = vfd.Open("/dev/cu.usbserial-1101", 9600)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = vfd.Print("Hello World!")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	}
+	EOS
+
+	$ go run ./
+
+
 # Futaba M202MD10B
 
 * 20x2, UART入力のドットマトリクスVFPモジュールです
