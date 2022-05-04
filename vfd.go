@@ -84,6 +84,7 @@ func (t *VFD) Open(port string, baud int) (err error) {
 	if err != nil {
 		return err
 	}
+	t.Reset()
 	return nil
 }
 
