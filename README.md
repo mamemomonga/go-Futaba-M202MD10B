@@ -43,6 +43,10 @@ Baud | BAUD0 | BAUD1
 2400 | ON | OFF
 1200 | ON | ON
 
+## キャラクター一覧
+
+[![aキャラクター一覧](http://img.youtube.com/vi/LQ5_wHmZV-o/0.jpg)](https://www.youtube.com/watch?v=LQ5_wHmZV-o)
+
 # 配線
 
 * USB-UARTモジュールを使用して、macOSにて製作しました。
