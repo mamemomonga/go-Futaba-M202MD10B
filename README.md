@@ -1,6 +1,7 @@
-# go-Futaba-M202MD10B
+# Futaba M202MD10B Go ライブラリ
 
-Futaba M202MD10B Go ライブラリ
+* Futaba M202MD10B を シリアルポート経由で Goからコントロールするライブラリです。
+* 文字の表示、アニメーション、外字の登録に対応しています。
 
 # リファレンス
 
@@ -52,8 +53,14 @@ Futaba M202MD10B Go ライブラリ
 
 	$ go run ./
 
+## サンプルコードの実行
 
-# Futaba M202MD10B
+	$ go mod vendor
+	$ go run ./examples/helloWorld
+	$ go run ./examples/animation
+	$ go run ./examples/cgram
+
+# ハードウェア: Futaba M202MD10B
 
 * 20x2, UART入力のドットマトリクスVFPモジュールです
 * 電源およびIOは 5V です
@@ -93,13 +100,6 @@ Baud | BAUD0 | BAUD1
 ## キャラクター一覧
 
 [![aキャラクター一覧](http://img.youtube.com/vi/s-9mbCNlsLk/0.jpg)](https://www.youtube.com/watch?v=s-9mbCNlsLk)
-
-# サンプルコードの実行
-
-	$ go mod vendor
-	$ go run ./examples/helloWorld
-	$ go run ./examples/animation
-	$ go run ./examples/cgram
 
 # 参考情報
 
