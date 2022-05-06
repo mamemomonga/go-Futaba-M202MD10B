@@ -8,6 +8,7 @@ package m202md10b
 import (
 	"errors"
 	"io/ioutil"
+	"log"
 	"regexp"
 	"strings"
 	"time"
@@ -107,34 +108,57 @@ func (t *VFD) PutChar(c byte) error {
 	if err := t.WriteByte(c); err != nil {
 		return err
 	}
+
+	if t.bufPos >= 40 {
+		return nil // FIXME
+	}
+
 	t.bufText[t.bufPos] = c
 	t.bufPos++
+
 	return nil
 }
 
-// 半角に変換
-func (t *VFD) convertToHankaku(str string) (string, error) {
-	// 半角にする
-	str = width.Narrow.String(norm.NFD.String(str))
-	iostr := strings.NewReader(str)
-	ior := transform.NewReader(iostr, japanese.ShiftJIS.NewEncoder())
-	ra, err := ioutil.ReadAll(ior)
-	if err != nil {
-		return "", err
+// 文字の変換
+func (t *VFD) convertText(str string) ([]byte, error) {
+	var err error
+	str = rexLF.ReplaceAllString(str, string([]byte{0x0A})) // CRLFはLFに統一
+	str = width.Narrow.String(norm.NFD.String(str))         // 半角にする
+	var ra []byte
+	{
+		iostr := strings.NewReader(str)
+		ior := transform.NewReader(iostr, japanese.ShiftJIS.NewEncoder())
+		ra, err = ioutil.ReadAll(ior)
+		if err != nil {
+			return nil, err
+		}
+	} // Shift_JISにする
+
+	nb := make([]byte, len(ra))
+	for i, c := range ra {
+		switch {
+		case (c >= 0x20) && (c <= 0x7E): // 英数字
+			nb[i] = c
+		case (c >= 0xA1) && (c <= 0xDF): // カタカナ
+			nb[i] = c
+		case c == 0x0A: // LF
+			nb[i] = 0x0A
+		default:
+			nb[i] = 0x20
+		}
 	}
-	return string(ra), nil
+	return nb, nil
 }
 
 // 文字の表示
 func (t *VFD) Print(str string) error {
-	str = rexLF.ReplaceAllString(str, string([]byte{0x0A})) // CRLFはLFに統一
-	str, err := t.convertToHankaku(str)
-	if err != nil {
-		return err
-	}
+	buf, err := t.convertText(str)
+	for _, c := range buf {
 
-	ba := []byte(str)
-	for _, c := range ba {
+		if t.bufPos > 40 {
+			break
+		}
+
 		switch {
 		case c == 0x0A: // LF
 			t.CursorLine2()
@@ -149,10 +173,10 @@ func (t *VFD) Print(str string) error {
 		switch t.Animation {
 		case AnimationEnable:
 			err = t.textAnimation(c)
+			continue
 		case AnimationDisable:
-			err = t.WriteByte(c)
-			t.bufText[t.bufPos] = c
-			t.bufPos++
+			err = t.PutChar(c)
+			continue
 		}
 	}
 	return err
@@ -165,6 +189,10 @@ func (t *VFD) Println(str string) error {
 
 // テキストエフェクト
 func (t *VFD) textAnimation(c byte) error {
+	if t.bufPos >= 40 {
+		return nil // FIXME
+	}
+
 	dir := 0
 	switch {
 	case c >= 0xE0:
@@ -176,11 +204,13 @@ func (t *VFD) textAnimation(c byte) error {
 	default:
 		dir = 0
 	}
+	if t.bufPos == 39 { // 最後の文字はアニメーションしない(カーソルが戻せない)
+		dir = 0
+	}
 
-	var start byte
 	switch {
 	case dir == 1:
-		start = c - t.AnimationCharStart
+		start := c - t.AnimationCharStart
 		if start < 0x20 {
 			start = 0x20
 		}
@@ -195,7 +225,7 @@ func (t *VFD) textAnimation(c byte) error {
 			t.CursorReverse()
 		}
 	case dir == -1:
-		start = c + t.AnimationCharStart
+		start := c + t.AnimationCharStart
 		if start > 0xE0 {
 			start = 0xE0
 		}
@@ -290,6 +320,8 @@ func (t *VFD) CursorLine1() error {
 
 // カーソルを2行目に
 func (t *VFD) CursorLine2() error {
+
+	log.Println("CursorLine2")
 	if err := t.CursorHome(); err != nil {
 		return err
 	}

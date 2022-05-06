@@ -9,7 +9,7 @@ import (
 
 const (
 	SERIAL_PORT = "/dev/cu.usbserial-1101"
-	WAIT_TIME   = time.Second * 3
+	WAIT_TIME   = time.Second * 1
 )
 
 func ExampleVFD() {
@@ -79,6 +79,52 @@ func ExampleVFD_Println() {
 		log.Fatal(err)
 	}
 	err = vfd.Print("  World!")
+	if err != nil {
+		log.Fatal(err)
+	}
+	time.Sleep(WAIT_TIME)
+	// Output:
+}
+
+func ExampleVFD_LongTest1() {
+	vfd := M202MD10B.New()
+	var err error
+
+	err = vfd.Open(SERIAL_PORT, 9600) // SERIAL_PORT: e.g. /dev/ttyUSB0, /dev/cu.usbserial
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer vfd.Close()
+
+	err = vfd.Println("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = vfd.Print("abcdefghijklmnopqrstuvwxyz")
+	if err != nil {
+		log.Fatal(err)
+	}
+	time.Sleep(WAIT_TIME)
+	// Output:
+}
+
+func ExampleVFD_LongTest2() {
+	vfd := M202MD10B.New()
+	var err error
+
+	err = vfd.Open(SERIAL_PORT, 9600) // SERIAL_PORT: e.g. /dev/ttyUSB0, /dev/cu.usbserial
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer vfd.Close()
+
+	vfd.Animation = M202MD10B.AnimationEnable
+
+	err = vfd.Println("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = vfd.Println("abcdefghijklmnopqrstuvwxyz")
 	if err != nil {
 		log.Fatal(err)
 	}
