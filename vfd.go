@@ -8,7 +8,6 @@ package m202md10b
 import (
 	"errors"
 	"io/ioutil"
-	"log"
 	"regexp"
 	"strings"
 	"time"
@@ -45,6 +44,7 @@ const (
 var (
 	ErrBrightnessOutOfRange = errors.New("brightness out of range") // 明るさ設定が範囲外
 	ErrCursorTypeNotDefined = errors.New("cursor type not defined") // カーソルの種類が範囲外
+	ErrBufferOverflow       = errors.New("buffer overflow")         // バッファがいっぱい
 	rexLF                   = regexp.MustCompile("(?:\r\n)|\n")
 )
 
@@ -108,11 +108,9 @@ func (t *VFD) PutChar(c byte) error {
 	if err := t.WriteByte(c); err != nil {
 		return err
 	}
-
 	if t.bufPos >= 40 {
-		return nil // FIXME
+		return ErrBufferOverflow
 	}
-
 	t.bufText[t.bufPos] = c
 	t.bufPos++
 
@@ -152,13 +150,15 @@ func (t *VFD) convertText(str string) ([]byte, error) {
 
 // 文字の表示
 func (t *VFD) Print(str string) error {
+	var err error
 	buf, err := t.convertText(str)
+	if err != nil {
+		return err
+	}
 	for _, c := range buf {
-
-		if t.bufPos > 40 {
-			break
+		if t.bufPos >= 40 {
+			return ErrBufferOverflow
 		}
-
 		switch {
 		case c == 0x0A: // LF
 			t.CursorLine2()
@@ -173,13 +173,19 @@ func (t *VFD) Print(str string) error {
 		switch t.Animation {
 		case AnimationEnable:
 			err = t.textAnimation(c)
+			if err != nil {
+				return err
+			}
 			continue
 		case AnimationDisable:
 			err = t.PutChar(c)
+			if err != nil {
+				return err
+			}
 			continue
 		}
 	}
-	return err
+	return nil
 }
 
 // 文字の表示(改行付き)
@@ -287,13 +293,20 @@ func (t *VFD) Clear() error {
 	return nil
 }
 
+// 画面クリア(カーソルを移動しない)
+func (t *VFD) ClearCursorNRTH() error {
+	t.bufClear()
+	t.clearDisplayNRTH()
+	return nil
+}
+
 // 画面を削除して左上に移動
 func (t *VFD) clearDisplay() error {
 	return t.WriteByte(byte(0x0c))
 }
 
 // 画面を削除するが左上に戻らない
-func (t *VFD) clearDisplayNoReturnToHome() error {
+func (t *VFD) clearDisplayNRTH() error {
 	return t.WriteByte(byte(0x0a))
 }
 
@@ -320,8 +333,6 @@ func (t *VFD) CursorLine1() error {
 
 // カーソルを2行目に
 func (t *VFD) CursorLine2() error {
-
-	log.Println("CursorLine2")
 	if err := t.CursorHome(); err != nil {
 		return err
 	}

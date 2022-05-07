@@ -1,6 +1,7 @@
 package m202md10b_test
 
 import (
+	"errors"
 	"log"
 	"time"
 
@@ -41,6 +42,7 @@ func ExampleVFD() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	time.Sleep(WAIT_TIME)
 	// Output:
 
@@ -60,6 +62,7 @@ func ExampleVFD_Print() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	time.Sleep(WAIT_TIME)
 	// Output:
 }
@@ -78,15 +81,17 @@ func ExampleVFD_Println() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	err = vfd.Print("  World!")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	time.Sleep(WAIT_TIME)
 	// Output:
 }
 
-func ExampleVFD_LongTest1() {
+func VFD_LongStringTest1() {
 	vfd := M202MD10B.New()
 	var err error
 
@@ -95,20 +100,28 @@ func ExampleVFD_LongTest1() {
 		log.Fatal(err)
 	}
 	defer vfd.Close()
+
+	errChk := func(err error) {
+		if err != nil {
+			if errors.Is(err, M202MD10B.ErrBufferOverflow) {
+				log.Printf("warn: %v", err)
+			} else {
+				log.Fatalf("alert: %v", err)
+			}
+		}
+	}
 
 	err = vfd.Println("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	if err != nil {
-		log.Fatal(err)
-	}
+	errChk(err)
+
 	err = vfd.Print("abcdefghijklmnopqrstuvwxyz")
-	if err != nil {
-		log.Fatal(err)
-	}
+	errChk(err)
+
 	time.Sleep(WAIT_TIME)
 	// Output:
 }
 
-func ExampleVFD_LongTest2() {
+func VFD_LongStringTest2() {
 	vfd := M202MD10B.New()
 	var err error
 
@@ -117,17 +130,25 @@ func ExampleVFD_LongTest2() {
 		log.Fatal(err)
 	}
 	defer vfd.Close()
+
+	errChk := func(err error) {
+		if err != nil {
+			if errors.Is(err, M202MD10B.ErrBufferOverflow) {
+				log.Printf("warn: %v", err)
+			} else {
+				log.Fatalf("alert: %v", err)
+			}
+		}
+	}
 
 	vfd.Animation = M202MD10B.AnimationEnable
 
 	err = vfd.Println("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	if err != nil {
-		log.Fatal(err)
-	}
+	errChk(err)
+
 	err = vfd.Println("abcdefghijklmnopqrstuvwxyz")
-	if err != nil {
-		log.Fatal(err)
-	}
+	errChk(err)
+
 	time.Sleep(WAIT_TIME)
 	// Output:
 }
@@ -159,16 +180,27 @@ func ExampleVFD_ClearAnimation() {
 	}
 	defer vfd.Close()
 
+	errChk := func(err error) {
+		if err != nil {
+			if errors.Is(err, M202MD10B.ErrBufferOverflow) {
+				log.Printf("warn: %v", err)
+			} else {
+				log.Fatalf("alert: %v", err)
+			}
+		}
+	}
+
 	vfd.CursorEnable(M202MD10B.CursorTypeUnderline)
 	vfd.CursorBlink(true)
 	vfd.Animation = M202MD10B.AnimationEnable
+
 	err = vfd.Print("  Welcome To THE\nC Y B E R S P A C E")
-	if err != nil {
-		log.Fatal(err)
-	}
+	errChk(err)
 
 	time.Sleep(WAIT_TIME)
-	vfd.ClearAnimation()
+
+	err = vfd.ClearAnimation()
+	errChk(err)
 	// Output:
 }
 
