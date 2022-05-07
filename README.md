@@ -7,11 +7,13 @@
 
 [![GoDoc](https://godoc.org/github.com/mamemomonga/go-Futaba-M202MD10B?status.svg)](https://godoc.org/github.com/mamemomonga/go-Futaba-M202MD10B)
 
-うまく閲覧できない場合は[こちら](./Doc.md)をご覧下さい。
+うまく閲覧できない場合は[こちら](./documents/godoc.md)をご覧下さい。
 
 # クイックスタート
 
-## 配線
+## 配線例
+
+![配線例](./documents/example.png)
 
 * コネクタは PHコネクタ 7ピン が合います。
 * USB-UARTモジュールを使用して、macOSにて製作しました。
@@ -43,6 +45,8 @@
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer vfd.Close()
+
 		err = vfd.Print("Hello World!")
 		if err != nil {
 			log.Fatal(err)
