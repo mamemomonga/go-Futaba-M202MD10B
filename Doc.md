@@ -21,6 +21,7 @@ Futaba M202MD10B用ライブラリ
   - [func (t *VFD) CGRAMFromStrings(code byte, graphic [7]string) error](<#func-vfd-cgramfromstrings>)
   - [func (t *VFD) Clear() error](<#func-vfd-clear>)
   - [func (t *VFD) ClearAnimation() error](<#func-vfd-clearanimation>)
+  - [func (t *VFD) ClearCursorNRTH() error](<#func-vfd-clearcursornrth>)
   - [func (t *VFD) Close()](<#func-vfd-close>)
   - [func (t *VFD) CursorBlink(blink bool) error](<#func-vfd-cursorblink>)
   - [func (t *VFD) CursorDisable() error](<#func-vfd-cursordisable>)
@@ -76,6 +77,7 @@ const (
 var (
     ErrBrightnessOutOfRange = errors.New("brightness out of range") // 明るさ設定が範囲外
     ErrCursorTypeNotDefined = errors.New("cursor type not defined") // カーソルの種類が範囲外
+    ErrBufferOverflow       = errors.New("buffer overflow")         // バッファがいっぱい
 
 )
 ```
@@ -108,7 +110,7 @@ import (
 
 const (
 	SERIAL_PORT = "/dev/cu.usbserial-1101"
-	WAIT_TIME   = time.Second * 3
+	WAIT_TIME   = time.Second * 1
 )
 
 func main() {
@@ -140,6 +142,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	time.Sleep(WAIT_TIME)
 }
 ```
@@ -199,7 +202,7 @@ import (
 
 const (
 	SERIAL_PORT = "/dev/cu.usbserial-1101"
-	WAIT_TIME   = time.Second * 3
+	WAIT_TIME   = time.Second * 1
 )
 
 func main() {
@@ -307,7 +310,7 @@ import (
 
 const (
 	SERIAL_PORT = "/dev/cu.usbserial-1101"
-	WAIT_TIME   = time.Second * 3
+	WAIT_TIME   = time.Second * 1
 )
 
 func main() {
@@ -351,6 +354,7 @@ func (t *VFD) ClearAnimation() error
 package main
 
 import (
+	"errors"
 	M202MD10B "github.com/mamemomonga/go-Futaba-M202MD10B"
 	"log"
 	"time"
@@ -358,7 +362,7 @@ import (
 
 const (
 	SERIAL_PORT = "/dev/cu.usbserial-1101"
-	WAIT_TIME   = time.Second * 3
+	WAIT_TIME   = time.Second * 1
 )
 
 func main() {
@@ -371,16 +375,27 @@ func main() {
 	}
 	defer vfd.Close()
 
+	errChk := func(err error) {
+		if err != nil {
+			if errors.Is(err, M202MD10B.ErrBufferOverflow) {
+				log.Printf("warn: %v", err)
+			} else {
+				log.Fatalf("alert: %v", err)
+			}
+		}
+	}
+
 	vfd.CursorEnable(M202MD10B.CursorTypeUnderline)
 	vfd.CursorBlink(true)
 	vfd.Animation = M202MD10B.AnimationEnable
+
 	err = vfd.Print("  Welcome To THE\nC Y B E R S P A C E")
-	if err != nil {
-		log.Fatal(err)
-	}
+	errChk(err)
 
 	time.Sleep(WAIT_TIME)
-	vfd.ClearAnimation()
+
+	err = vfd.ClearAnimation()
+	errChk(err)
 }
 ```
 
@@ -392,6 +407,14 @@ func main() {
 
 </p>
 </details>
+
+### func \(\*VFD\) ClearCursorNRTH
+
+```go
+func (t *VFD) ClearCursorNRTH() error
+```
+
+画面クリア\(カーソルを移動しない\)
 
 ### func \(\*VFD\) Close
 
@@ -495,7 +518,7 @@ import (
 
 const (
 	SERIAL_PORT = "/dev/cu.usbserial-1101"
-	WAIT_TIME   = time.Second * 3
+	WAIT_TIME   = time.Second * 1
 )
 
 func main() {
@@ -512,6 +535,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	time.Sleep(WAIT_TIME)
 }
 ```
@@ -547,7 +571,7 @@ import (
 
 const (
 	SERIAL_PORT = "/dev/cu.usbserial-1101"
-	WAIT_TIME   = time.Second * 3
+	WAIT_TIME   = time.Second * 1
 )
 
 func main() {
@@ -564,10 +588,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	err = vfd.Print("  World!")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	time.Sleep(WAIT_TIME)
 }
 ```
